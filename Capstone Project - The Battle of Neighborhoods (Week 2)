@@ -1,0 +1,125 @@
+Peer-graded Assignment: Capstone Project - The Battle of Neighborhoods (Week 1)
+Now that you have been equipped with the skills and the tools to use location data to explore a geographical location, over the course of two weeks, you will have the opportunity to be as creative as you want and come up with an idea to leverage the Foursquare location data to explore or compare neighborhoods or cities of your choice or to come up with a problem that you can use the Foursquare location data to solve.
+
+1) Introduction/Business Problem
+Clearly define a problem or an idea of your choice, where you would need to leverage the Foursquare location data to solve or execute. Remember that data science problems always target an audience and are meant to help a group of stakeholders solve a problem, so make sure that you explicitly describe your audience and why they would care about your problem.
+
+Serena : The purpose for this project is to help people who are planning to open an new restaurant in Toronto to chose the idea loaction with analyzing the data that we generated from our project to get the comfort to find the right location to open the restaurnt. The data we generated from this project is not only for the population and income level for each location, but also for their existing competitors locally.
+
+Describe the data that you will be using to solve the problem or execute your idea. Remember that you will need to use the Foursquare location data to solve the problem or execute your idea. You can absolutely use other datasets in combination with the Foursquare location data. So make sure that you provide adequate explanation and discussion, with examples, of the data that you will be using, even if it is only Foursquare location data.
+
+Serena:I will combine use the Toronto's 2016-2020 Census data which includes popualtion, income, average income per neighborhood, working-aging, income growth and etc data and fourswaure APR to collect competitors in within the same region.
+Toronto's Census data is publicly available at this website: https://www.toronto.ca/wp-content/uploads/2019/11/99b4-TOHealthCheck_2019Chapter1.pdf
+
+Toronto Neighborhoods' shapefile is publicly available at this website:https://mdl.library.utoronto.ca/file-format-geospatial-data/shapefile?page=44
+Before we getting to our data exploration, let us download all the necessary data source first. 
+import numpy as np # library to handle data in a vectorized manner
+
+import pandas as pd # library for data analsysis
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+
+!conda install -c conda-forge geopy --yes # uncomment this line if you haven't completed the Foursquare API lab
+from geopy.geocoders import Nominatim # convert an address into latitude and longitude values
+
+!conda install -c conda-forge folium=0.5.0 --yes # uncomment this line if you haven't completed the Foursquare API lab
+import folium # map rendering library
+
+print('Libraries imported.')
+Solving environment: done
+
+## Package Plan ##
+
+  environment location: /home/jupyterlab/conda
+
+  added / updated specs: 
+    - geopy
+Download and explore the dataset. 
+Using data from 2016 -2020 census to collect Toronto's income per neighborhood
+# Toronto Open Data Catalogue - Neighbourhood Profiles 2016 (CSV)
+# https://mdl.library.utoronto.ca/file-format-geospatial-data/shapefile?page=44
+
+csv_path='https://https://mdl.library.utoronto.ca/file-format-geospatial-data/shapefile?page=44.csv'
+df = pd.read_csv(csv_path,encoding='latin1')
+print('Data loaded')
+Data loaded
+Data Sample
+
+Exploring collected data
+
+df.head()
+Category	Topic	Data Source	Characteristic	City of Toronto	Agincourt North	Agincourt South-Malvern West	Alderwood	Annex	Banbury-Don Mills	Bathurst Manor	Bay Street Corridor	Bayview Village	Bayview Woods-Steeles	Bedford Park-Nortown	Beechborough-Greenbrook	Bendale	Birchcliffe-Cliffside	Black Creek	Blake-Jones	Briar Hill-Belgravia	Bridle Path-Sunnybrook-York Mills	Broadview North	Brookhaven-Amesbury	Cabbagetown-South St. James Town	Caledonia-Fairbank	Casa Loma	Centennial Scarborough	Church-Yonge Corridor	Clairlea-Birchmount	Clanton Park	Cliffcrest	Corso Italia-Davenport	Danforth	Danforth East York	Don Valley Village	Dorset Park	Dovercourt-Wallace Emerson-Junction	Downsview-Roding-CFB	Dufferin Grove	East End-Danforth	Edenbridge-Humber Valley	Eglinton East	Elms-Old Rexdale	Englemount-Lawrence	Eringate-Centennial-West Deane	Etobicoke West Mall	Flemingdon Park	Forest Hill North	Forest Hill South	Glenfield-Jane Heights	Greenwood-Coxwell	Guildwood	Henry Farm	High Park North	High Park-Swansea	Highland Creek	Hillcrest Village	Humber Heights-Westmount	Humber Summit	Humbermede	Humewood-Cedarvale	Ionview	Islington-City Centre West	Junction Area	Keelesdale-Eglinton West	Kennedy Park	Kensington-Chinatown	Kingsview Village-The Westway	Kingsway South	Lambton Baby Point	L'Amoreaux	Lansing-Westgate	Lawrence Park North	Lawrence Park South	Leaside-Bennington	Little Portugal	Long Branch	Malvern	Maple Leaf	Markland Wood	Milliken	Mimico (includes Humber Bay Shores)	Morningside	Moss Park	Mount Dennis	Mount Olive-Silverstone-Jamestown	Mount Pleasant East	Mount Pleasant West	New Toronto	Newtonbrook East	Newtonbrook West	Niagara	North Riverdale	North St. James Town	Oakridge	Oakwood Village	O'Connor-Parkview	Old East York	Palmerston-Little Italy	Parkwoods-Donalda	Pelmo Park-Humberlea	Playter Estates-Danforth	Pleasant View	Princess-Rosethorn	Regent Park	Rexdale-Kipling	Rockcliffe-Smythe	Roncesvalles	Rosedale-Moore Park	Rouge	Runnymede-Bloor West Village	Rustic	Scarborough Village	South Parkdale	South Riverdale	St.Andrew-Windfields	Steeles	Stonegate-Queensway	Tam O'Shanter-Sullivan	Taylor-Massey	The Beaches	Thistletown-Beaumond Heights	Thorncliffe Park	Trinity-Bellwoods	University	Victoria Village	Waterfront Communities-The Island	West Hill	West Humber-Clairville	Westminster-Branson	Weston	Weston-Pelham Park	Wexford/Maryvale	Willowdale East	Willowdale West	Willowridge-Martingrove-Richview	Woburn	Woodbine Corridor	Woodbine-Lumsden	Wychwood	Yonge-Eglinton	Yonge-St.Clair	York University Heights	Yorkdale-Glen Park
+0	Neighbourhood Information	Neighbourhood Information	City of Toronto	Neighbourhood Number	NaN	129	128	20	95	42	34	76	52	49	39	112	127	122	24	69	108	41	57	30	71	109	96	133	75	120	33	123	92	66	59	47	126	93	26	83	62	9	138	5	32	11	13	44	102	101	25	65	140	53	88	87	134	48	8	21	22	106	125	14	90	110	124	78	6	15	114	117	38	105	103	56	84	19	132	29	12	130	17	135	73	115	2	99	104	18	50	36	82	68	74	121	107	54	58	80	45	23	67	46	10	72	4	111	86	98	131	89	28	139	85	70	40	116	16	118	61	63	3	55	81	79	43	77	136	1	35	113	91	119	51	37	7	137	64	60	94	100	97	27	31
+1	Neighbourhood Information	Neighbourhood Information	City of Toronto	TSNS2020 Designation	NaN	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	NIA	No Designation	No Designation	NIA	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	Emerging Neighbourhood	No Designation	NIA	No Designation	No Designation	No Designation	NIA	NIA	Emerging Neighbourhood	No Designation	No Designation	NIA	No Designation	No Designation	NIA	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	Emerging Neighbourhood	NIA	NIA	No Designation	NIA	No Designation	No Designation	NIA	NIA	No Designation	NIA	No Designation	No Designation	Emerging Neighbourhood	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	Emerging Neighbourhood	No Designation	No Designation	No Designation	No Designation	NIA	No Designation	NIA	NIA	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	NIA	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	No Designation	NIA	No Designation	NIA	No Designation	No Designation	No Designation	No Designation	NIA	NIA	NIA	No Designation	No Designation	Emerging Neighbourhood	No Designation	No Designation	NIA	No Designation	NIA	NIA	No Designation	No Designation	NIA	No Designation	NIA	No Designation	Emerging Neighbourhood	NIA	NIA	No Designation	No Designation	No Designation	No Designation	NIA	No Designation	No Designation	No Designation	No Designation	No Designation	NIA	Emerging Neighbourhood
+2	Population	Population and dwellings	Census Profile 98-316-X2016001	Population, 2016	2,731,571	29,113	23,757	12,054	30,526	27,695	15,873	25,797	21,396	13,154	23,236	6,577	29,960	22,291	21,737	7,727	14,257	9,266	11,499	17,757	11,669	9,955	10,968	13,362	31,340	26,984	16,472	15,935	14,133	9,666	17,180	27,051	25,003	36,625	35,052	11,785	21,381	15,535	22,776	9,456	22,372	18,588	11,848	21,933	12,806	10,732	30,491	14,417	9,917	15,723	22,162	23,925	12,494	16,934	10,948	12,416	15,545	14,365	13,641	43,965	14,366	11,058	17,123	17,945	22,000	9,271	7,985	43,993	16,164	14,607	15,179	16,828	15,559	10,084	43,794	10,111	10,554	26,572	33,964	17,455	20,506	13,593	32,954	16,775	29,658	11,463	16,097	23,831	31,180	11,916	18,615	13,845	21,210	18,675	9,233	13,826	34,805	10,722	7,804	15,818	11,051	10,803	10,529	22,246	14,974	20,923	46,496	10,070	9,941	16,724	21,849	27,876	17,812	24,623	25,051	27,446	15,683	21,567	10,360	21,108	16,556	7,607	17,510	65,913	27,392	33,312	26,274	17,992	11,098	27,917	50,434	16,936	22,156	53,485	12,541	7,865	14,349	11,817	12,528	27,593	14,804
+3	Population	Population and dwellings	Census Profile 98-316-X2016001	Population, 2011	2,615,060	30,279	21,988	11,904	29,177	26,918	15,434	19,348	17,671	13,530	23,185	6,488	27,876	21,856	22,057	7,763	14,302	8,713	11,563	17,787	12,053	9,851	10,487	13,093	28,349	24,770	14,612	15,703	13,743	9,444	16,712	26,739	24,363	34,631	34,659	11,449	20,839	14,943	22,829	9,550	22,086	18,810	10,927	22,168	12,474	10,926	31,390	14,083	9,816	11,333	21,292	21,740	13,097	17,656	10,583	12,525	15,853	14,108	13,091	38,084	14,027	10,638	17,058	18,495	21,723	9,170	7,921	44,919	14,642	14,541	15,070	17,011	12,050	9,632	45,086	10,197	10,436	27,167	26,541	17,587	16,306	13,145	32,788	15,982	28,593	10,900	16,423	23,052	21,274	12,191	17,832	13,497	21,073	18,316	9,118	13,746	34,617	8,710	7,653	16,144	11,197	10,007	10,488	22,267	15,050	20,631	45,912	9,632	9,951	16,609	21,251	25,642	17,958	25,017	24,691	27,398	15,594	21,130	10,138	19,225	16,802	7,782	17,182	43,361	26,547	34,100	25,446	18,170	12,010	27,018	45,041	15,004	21,343	53,350	11,703	7,826	13,986	10,578	11,652	27,713	14,687
+4	Population	Population and dwellings	Census Profile 98-316-X2016001	Population Change 2011-2016	4.50%	-3.90%	8.00%	1.30%	4.60%	2.90%	2.80%	33.30%
+Colecting neighborhoods's information
+
+Neighbourhoods = list(df.columns.values)
+Neighbourhoods = Neighbourhoods[5:]
+print(Neighbourhoods)
+Collecting Population information by neighbourhood
+
+Creating a new dataset
+
+dfToronto = pd.DataFrame(index=Neighbourhoods, columns=["Population_2016","Income_2016"])
+dfToronto.head()
+
+	Population_2016	Income_2016
+Agincourt North	NaN	NaN
+Agincourt South-Malvern West	NaN	NaN
+Alderwood	NaN	NaN
+Annex	NaN	NaN
+Banbury-Don Mills	NaN	NaN
+# Population_2016 = Population, 2016
+# Income_2016 = Total income: Average amount ($)
+
+populate the dataset
+
+for index, row in dfToronto.iterrows():
+    dfToronto.at[index, 'Population_2016'] = df[index][2]
+    dfToronto.at[index, 'Income_2016'] = df[index][2264]
+    dfToronto.sort_values('Income_2016')
+    
+    	Population_2016	Income_2016
+St.Andrew-Windfields	17,812	100,516
+Edenbridge-Humber Valley	15,535	101,551
+Lawrence Park North	14,607	111,730
+Annex	30,526	112,766
+Yonge-St.Clair	12,528	114,174
+Bedford Park-Nortown	23,236	123,077
+Leaside-Bennington	16,828	125,564
+Kingsway South	9,271	144,642
+Casa Loma	10,968	165,047
+Lawrence Park South	15,179	169,203
+Forest Hill South	10,732	204,521
+Rosedale-Moore Park	20,923	207,903
+Black Creek	21,737	25,989
+Mount Olive-Silverstone-Jamestown	32,954	26,548
+Oakridge	13,845	26,793
+Glenfield-Jane Heights	30,491	27,984
+Milliken	26,572	28,085
+Flemingdon Park	21,933	28,654
+Thorncliffe Park	21,108	28,875
+Humbermede	15,545	29,528
+Malvern	43,794	29,573
+.....
+Niagara	31,180	70,623
+Playter Estates-Danforth	7,804	70,831
+High Park-Swansea	23,925	71,204
+Runnymede-Bloor West Village	10,070	71,888
+Lansing-Westgate	16,164	72,371
+North Riverdale	11,916	73,253
+Lambton Baby Point	7,985	76,629
+Forest Hill North	12,806	85,099
+Mount Pleasant East	16,775	85,340
+Yonge-Eglinton	11,817	89,330
+The Beaches	21,567	92,580
+Princess-Rosethorn	11,051	99,055
+    Results section where you discuss the results.
+    Serena: From the above result, with the information about population and income in that neighborhood, we can locate the area with the highest population and income, that would be the best option for the investor to open the new restaurant. By using this metholodgy, it's easy for us to locate top 3 location which meets those critieras. 
+    Discussion section where you discuss any observations you noted and any recommendations you can make based on the results.
+    Serena: From the above discussion secton which I discussed my observation, I would recommendate the investors choose the location " The Beaches, with population of 11,051, and income $99,055, " High park-swansea" with the population of 23,925 and income $71,204, and "Princess-rosethorn with the population of 11,051, and income $99,055". 
+    Conclusion section where you conclude the report
+    Serena: In a conclustion. First, This report is very helpful and trustful for the investors who are inerested in finding a good location for them to open the restaurant. However, the result has the limitation since the data source we generated didnt cover all the aspects/ variables, such as, transporation, criminal case, car accidient case and etc.
